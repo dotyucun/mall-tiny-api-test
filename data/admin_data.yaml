@@ -1,0 +1,20 @@
+admin_list_data:
+  page_num: 1
+  page_size: 5
+  expected_code: 200
+  expected_message: "操作成功"
+
+admin_detail:
+  admin_id: 1
+  expected_username: "test"
+  expected_code: 200
+  expected_message: "操作成功"
+
+admin_crud:
+  username_prefix: "auto_crud_"
+  password: "Test123456"
+  email_domain: "example.com"
+  created_nick_name: "自动化创建用户"
+  created_note: "接口自动化创建的测试用户"
+  updated_nick_name: "自动化更新用户"
+  updated_note: "接口自动化已更新"

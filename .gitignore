@@ -1,0 +1,7 @@
+config/config.yaml
+.venv/
+__pycache__/
+reports/
+.pytest_cache/
+*.pyc
+allure-results/
