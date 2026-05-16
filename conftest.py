@@ -1,7 +1,7 @@
 import pytest
 
-from mall_tiny_test.common.request_util import send_request
-from mall_tiny_test.common.yaml_util import load_yaml
+from common.request_util import send_request
+from common.yaml_util import load_yaml
 
 
 config = load_yaml("config/config.yaml")

@@ -1,6 +1,6 @@
 import allure
 
-from mall_tiny_test.common.db_util import query_all
+from common.db_util import query_all
 
 
 def query_user_resource(username, resource_url):

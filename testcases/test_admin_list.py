@@ -1,7 +1,7 @@
 import allure
 
-from mall_tiny_test.common.request_util import send_request, assert_status_code
-from mall_tiny_test.common.yaml_util import load_yaml
+from common.request_util import send_request, assert_status_code
+from common.yaml_util import load_yaml
 
 
 admin_data = load_yaml("data/admin_data.yaml")

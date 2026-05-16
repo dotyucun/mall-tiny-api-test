@@ -1,6 +1,6 @@
 import allure
 
-from mall_tiny_test.common.request_util import send_request, assert_status_code
+from common.request_util import send_request, assert_status_code
 
 
 @allure.feature("后台用户管理")

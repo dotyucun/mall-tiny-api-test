@@ -1,6 +1,6 @@
 import pymysql
 
-from mall_tiny_test.common.yaml_util import load_yaml
+from common.yaml_util import load_yaml
 
 
 config = load_yaml("config/config.yaml")
