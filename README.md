@@ -178,7 +178,7 @@ allure generate allure-results -o reports/allure-report --clean
 
 报告截图示例：
 
-![Allure 报告概览](docs/images/allure-overview.png)
+![Allure 报告概览](./docs/images/allure-overview.png)
 
 ## GitHub Actions CI
 
