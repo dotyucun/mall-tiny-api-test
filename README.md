@@ -29,7 +29,7 @@ mall_tiny_test/
 │   └── config.yaml            # 本地真实配置，包含账号/数据库信息，不提交
 ├── data/                     # 测试数据
 │   ├── login_data.yaml        # 登录失败场景数据
-│   └── admin_data.yaml        # 用户列表、用户详情、CRUD 测试数据
+│   └── admin_data.yaml        # 用户列表、临时用户测试数据
 ├── docs/images/              # README 展示图片
 │   └── allure-overview.png
 ├── testcases/                # 测试用例
@@ -62,7 +62,7 @@ mall_tiny_test/
 - 支持多角色权限测试，覆盖超级管理员、商品管理员、订单管理员。
 - 明确区分 401 和 403：未登录/无 token 是 401，已登录但无权限是 403。
 - 引入数据库断言，校验接口响应和数据库业务数据的一致性。
-- CRUD 用例使用随机用户名，并在用例结束后清理测试数据，减少数据库污染。
+- 详情与 CRUD 用例动态创建临时用户，并通过 fixture 在用例结束后统一清理测试数据，减少环境依赖和数据库污染。
 - 接入 GitHub Actions，提交代码后自动做依赖安装、语法检查和用例收集。
 - 配置和测试数据拆分，真实环境信息通过 `config.yaml` 管理，不提交到仓库。
 
@@ -75,15 +75,14 @@ mall_tiny_test/
 - 订单管理员账号：`orderAdmin / 123456`
 - `admin` 用户拥有 `/admin/**` 相关资源权限
 - `productAdmin` 和 `orderAdmin` 不拥有 `/admin/**` 资源权限
-- `admin_detail.admin_id` 对应的用户存在，当前示例配置中使用 `id = 1`，用户名期望为 `test`
 - MySQL 中已初始化 mall-tiny 默认表结构和基础权限数据
 
-CRUD 用例会创建 `auto_crud_` 前缀的临时后台用户，并在测试结束后通过接口和数据库兜底清理。
+用户详情与 CRUD 用例会创建 `auto_crud_` 前缀的临时后台用户，并在测试结束后通过 fixture 和数据库清理方法兜底回收。
 
 如果你的本地 mall-tiny 初始化数据和上面不一致，可以修改：
 
 - `config/config.yaml`：账号、接口地址、数据库连接
-- `data/admin_data.yaml`：用户详情 ID、用户名期望值、CRUD 测试数据
+- `data/admin_data.yaml`：用户列表断言和临时用户测试数据
 - `data/login_data.yaml`：登录失败场景的期望响应
 
 ## 环境搭建

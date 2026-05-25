@@ -1,18 +1,15 @@
 import allure
 
 from common.request_util import send_request, assert_status_code
-from common.yaml_util import load_yaml
 from common.db_util import query_one
-
-
-admin_data = load_yaml("data/admin_data.yaml")
-admin_detail_data = admin_data["admin_detail"]
 
 
 @allure.feature("后台用户管理")
 @allure.story("根据 ID 获取后台用户信息")
-def test_get_admin_by_id_success(admin_token):
-    admin_id = admin_detail_data["admin_id"]
+def test_get_admin_by_id_success(admin_token, admin_factory):
+    created_admin = admin_factory()
+    admin_id = created_admin["id"]
+    username = created_admin["payload"]["username"]
 
     response = send_request(
         "GET",
@@ -23,11 +20,11 @@ def test_get_admin_by_id_success(admin_token):
     assert_status_code(response, 200)
     body = response.json()
 
-    assert body["code"] == admin_detail_data["expected_code"]
-    assert body["message"] == admin_detail_data["expected_message"]
+    assert body["code"] == 200
+    assert body["message"] == "操作成功"
     assert body["data"] is not None
     assert body["data"]["id"] == admin_id
-    assert body["data"]["username"] == admin_detail_data["expected_username"]
+    assert body["data"]["username"] == username
 
     db_admin = query_one(
         "select id, username from ums_admin where id = %s",

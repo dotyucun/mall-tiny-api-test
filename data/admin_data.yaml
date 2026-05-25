@@ -4,13 +4,7 @@ admin_list_data:
   expected_code: 200
   expected_message: "操作成功"
 
-admin_detail:
-  admin_id: 1
-  expected_username: "test"
-  expected_code: 200
-  expected_message: "操作成功"
-
-admin_crud:
+temporary_admin:
   username_prefix: "auto_crud_"
   password: "Test123456"
   email_domain: "example.com"
