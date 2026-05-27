@@ -8,21 +8,19 @@ on:
 jobs:
   api-regression:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout test repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout mall-tiny backend fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: dotyucun/mall-tiny
           path: sut/mall-tiny
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -30,7 +28,7 @@ jobs:
           cache-dependency-path: sut/mall-tiny/pom.xml
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -93,7 +91,7 @@ jobs:
 
       - name: Upload Allure results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-results
           path: allure-results
