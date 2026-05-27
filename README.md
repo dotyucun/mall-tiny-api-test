@@ -12,6 +12,7 @@
 - PyYAML
 - PyMySQL
 - Allure
+- Docker Compose
 - GitHub Actions
 
 ## 项目结构
@@ -63,12 +64,12 @@ mall_tiny_test/
 - 明确区分 401 和 403：未登录/无 token 是 401，已登录但无权限是 403。
 - 引入数据库断言，校验接口响应和数据库业务数据的一致性。
 - 详情与 CRUD 用例动态创建临时用户，并通过 fixture 在用例结束后统一清理测试数据，减少环境依赖和数据库污染。
-- 接入 GitHub Actions，提交代码后自动做依赖安装、语法检查和用例收集。
+- 接入 GitHub Actions，提交代码后自动构建 mall-tiny、启动 Docker 被测环境、执行接口回归并上传 Allure 结果。
 - 配置和测试数据拆分，真实环境信息通过 `config.yaml` 管理，不提交到仓库。
 
 ## 测试数据依赖
 
-运行完整接口测试前，需要先保证 mall-tiny 后端和数据库中存在以下基础数据：
+运行完整接口测试前，需要保证被测 mall-tiny 后端和数据库中存在以下基础数据。CI 使用 [dotyucun/mall-tiny](https://github.com/dotyucun/mall-tiny) fork 中的 Docker Compose 测试环境自动初始化这些数据：
 
 - 超级管理员账号：`admin / macro123`
 - 商品管理员账号：`productAdmin / 123456`
@@ -131,13 +132,28 @@ Copy-Item config/config.example.yaml config/config.yaml
 
 `config/config.yaml` 包含真实账号和数据库信息，已通过 `.gitignore` 排除，不要提交。
 
-### 3. 启动 mall-tiny
+### 3. 启动 mall-tiny 测试环境
 
-先在本地启动 mall-tiny 后端服务，并确认：
+推荐使用测试环境 fork 启动完整依赖：
+
+```bash
+git clone https://github.com/dotyucun/mall-tiny.git ../mall-tiny
+cd ../mall-tiny
+mvn -DskipTests package
+docker compose -f compose.test.yaml up -d --build
+```
+
+启动后确认：
 
 - 后端接口可访问，例如 `http://localhost:8080/admin/login`
 - MySQL 已启动，且 `mall_tiny` 数据库已初始化
 - 测试账号、角色权限、资源权限数据存在
+
+测试完成后可关闭并重置该测试环境：
+
+```bash
+docker compose -f compose.test.yaml down -v
+```
 
 ## 运行测试
 
@@ -181,18 +197,20 @@ allure generate allure-results -o reports/allure-report --clean
 
 ## GitHub Actions CI
 
-项目已添加 `.github/workflows/ci.yml`。CI 会在 `push` 和 `pull_request` 时执行：
+项目已添加 `.github/workflows/ci.yml`。CI 会在 `push`、`pull_request` 和手动触发时执行：
 
-- 安装 Python 依赖
-- 复制 `config/config.example.yaml` 为临时 `config/config.yaml`
+- 拉取接口测试项目和 `dotyucun/mall-tiny` 被测服务 fork
+- 安装 Java/Python 依赖并通过 Maven 编译后端
+- 使用 Docker Compose 启动 MySQL、Redis 和 mall-tiny API
+- 等待健康检查通过并生成临时测试配置
 - 编译检查 Python 文件
-- 执行 `pytest --collect-only`
+- 执行完整 `pytest` 接口回归
+- 上传 `allure-results` 测试结果并清理容器环境
 
-完整接口测试依赖本地 mall-tiny 服务和 MySQL 数据，因此 CI 先做稳定的静态校验和用例收集。后续如果有独立测试环境，可以把 CI 扩展为真正执行接口测试并上传 Allure 报告。
+首次真实 CI 回归运行记录：[API Regression CI #5](https://github.com/dotyucun/mall-tiny-api-test/actions/runs/26520151751)，云端执行结果为 `21 passed`，并保存 Allure 结果产物。
 
 ## 后续计划
 
-- 扩展更多业务模块接口，例如商品、订单、资源、菜单等。
-- 补充用户 CRUD 的角色分配、启用/禁用后的登录校验。
-- 增加更完整的数据准备和回滚机制，让用例对环境依赖更低。
-- 将 Allure 报告作为 CI 产物保存，方便查看历史执行结果。
+- 基于现有 UMS 权限接口补充“授权前拒绝、授权后放行、撤销后再次拒绝”的动态权限场景。
+- 引入 Locust，对登录与权限查询接口建立基础性能基线。
+- 商品、购物车和订单交易链路不属于本项目实际接口范围，后续在完整 `mall` 项目中单独开展测试设计。
